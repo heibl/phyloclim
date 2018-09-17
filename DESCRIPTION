@@ -1,0 +1,16 @@
+Package: phyloclim
+Type: Package
+Title: Integrating Phylogenetics and Climatic Niche Modeling
+Version: 0.9.7
+Date: 2018-09-17
+Author: Christoph Heibl, Clement Calenge (\code{import.ascii})
+Maintainer: Christoph Heibl <christoph.heibl@gmx.net>
+Depends: ape, raster
+Imports: methods, sp
+Description: Implements some methods in phyloclimatic modeling: 
+  estimation of ancestral climatic niches, age-range-correlation, 
+  niche equivalency test and background-similarity test.
+License: GPL (>= 2)
+Encoding: UTF-8
+Packaged: Mon Sep 17 11:25:16 2018
+RoxygenNote: 6.0.1
