@@ -28,6 +28,7 @@ plotPNO(x, subset = NULL, thinning = NULL, xlab = NULL,
   
   \item{wm}{A logical indicating if weighted mean should added for each species.}
   \item{legend.pos}{Controls the position of the legend. Might eihter be a list object containing x and y coordinates (such as e.g. returned by \code{\link{locator}}) of the \bold{topleft corner} of the legend box or one of the following: \code{"topleft"} (default), \code{"bottomleft"}, \code{"topright"}, or \code{"bottomright"}. If \code{legend.pos == NULL} the plotting of the legend is suppressed.}
+  \item{legend.cex}{Numeric controlling the size of the legend.}
 }
 
 \references{

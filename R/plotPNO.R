@@ -6,7 +6,7 @@
 #' @export
 
 plotPNO <- function(x, subset = NULL, thinning = NULL, xlab = NULL, 
-                    tail_threshold = 0, wm = FALSE, legend.pos = "topleft"){
+                    tail_threshold = 0, wm = FALSE, legend.pos = "topleft", legend.cex = 1){
 	
 	# calculate weighted means:
 	# -------------------------
@@ -54,31 +54,33 @@ plotPNO <- function(x, subset = NULL, thinning = NULL, xlab = NULL,
 	# --------------------
 	if (!is.null(legend.pos)){
 		if (is.list(legend.pos))
-		    legend(x = legend.pos$x, y = legend.pos$y,  			    legend = colnames(x)[2:dim(x)[2]], fill = col)
+		    legend(x = legend.pos$x, y = legend.pos$y, legend = colnames(x)[2:dim(x)[2]], fill = col,
+		           cex = legend.cex)
 		else {
 			if (legend.pos == "topleft")
-			    lxy <- legend(x = min(x[, 1]), y = max(x[, -1]),  			        legend = colnames(x)[2:dim(x)[2]], fill = col)
+			    lxy <- legend(x = min(x[, 1]), y = max(x[, -1]), 
+			                  legend = colnames(x)[2:dim(x)[2]], fill = col, cex = legend.cex)
 			
 			if (legend.pos == "bottomleft"){
-				lxy <- legend(x = min(x[, 1]), y = min(x[, -1]),  			        legend = colnames(x)[2:dim(x)[2]], 
+				lxy <- legend(x = min(x[, 1]), y = min(x[, -1]), legend = colnames(x)[2:dim(x)[2]], 
 				    fill = col, plot = FALSE)$rect
 				xx <- min(x[, 1])
 				yy <- min(x[, -1]) + lxy$h
-			    legend(x = xx, y = yy, fill = col, 					legend = colnames(x)[2:dim(x)[2]])
+			    legend(x = xx, y = yy, fill = col, legend = colnames(x)[2:dim(x)[2]], cex = legend.cex)
 			}
 			if (legend.pos == "topright"){
-				lxy <- legend(x = min(x[, 1]), y = min(x[, -1]),  			        legend = colnames(x)[2:dim(x)[2]], 
+				lxy <- legend(x = min(x[, 1]), y = min(x[, -1]), legend = colnames(x)[2:dim(x)[2]], 
 				    fill = col, plot = FALSE)$rect
 				xx <- max(x[, 1]) - lxy$w
 				yy <- max(x[, -1]) 
-			    legend(x = xx, y = yy, fill = col, 					legend = colnames(x)[2:dim(x)[2]])
+			    legend(x = xx, y = yy, fill = col, legend = colnames(x)[2:dim(x)[2]], cex = legend.cex)
 			}
 			if (legend.pos == "bottomright"){
-				lxy <- legend(x = min(x[, 1]), y = min(x[, -1]),  			        legend = colnames(x)[2:dim(x)[2]], 
+				lxy <- legend(x = min(x[, 1]), y = min(x[, -1]), legend = colnames(x)[2:dim(x)[2]], 
 				    fill = col, plot = FALSE)$rect
 				xx <- max(x[, 1]) - lxy$w
 				yy <- min(x[, -1]) + lxy$h
-			    legend(x = xx, y = yy, fill = col, 					legend = colnames(x)[2:dim(x)[2]])
+			    legend(x = xx, y = yy, fill = col, legend = colnames(x)[2:dim(x)[2]], cex = legend.cex)
 			}
 		}
 	}
@@ -88,6 +90,6 @@ plotPNO <- function(x, subset = NULL, thinning = NULL, xlab = NULL,
 	# --------------------
 	if (wm){
 		for (i in seq(along = wmean))
-			lines(rep(wmean[i], 2), range(x[, -1]), col = col[i],				lty = 3, lwd = 3)
+			lines(rep(wmean[i], 2), range(x[, -1]), col = col[i], lty = 3, lwd = 3)
 	}
 }

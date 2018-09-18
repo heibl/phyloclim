@@ -1,8 +1,6 @@
 pno.weighted.mean <- 						
 function(x, subset = NULL, normalize = TRUE){
 	
-	#x <- cbind("VAR" = as.numeric(rownames(x)), x)
-	
 	# subset matrix
 	# ---------------------
 	if (!is.null(subset))
