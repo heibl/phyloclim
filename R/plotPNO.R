@@ -1,6 +1,44 @@
 ## This code is part of the phyloclim package
-## © C. Heibl 2009 (last update 2018-05-24)
+## © C. Heibl 2009 (last update 2020-01-18)
 
+#' @title  Plot Predicted Niche Occupancy Profiles
+#' @description Plot predicted niche occupancy profiles (PNOs). PNOs can be
+#'   obtained in a geographical information system by summing the cumulative
+#'   probabilies of each climatical value for a species distribution model
+#'   (SDM).
+#' @param x A data frame or matrix with columns corresponding to species and
+#'   rows corresponding to values along an environmental gradient. The first
+#'   columns contains the environmental variable, the remaining colums
+#'   probabilities of suitability.
+#' @param subset A vector of mode \code{"character"} which can be used to
+#'   restrict the calculation of weighted means to those columsn in \code{x}
+#'   whose column names match \code{subset}; defaults to \code{NULL}.
+#' @param thinning An integer that can be used to thin fuzzy PNOs prior to
+#'   plotting; defaults to \code{NULL}.
+#' @param xlab A character string given the label for the x-axis.
+#' @param tail_threshold A numeric that can be used cut long tails of PNOs;
+#'   defaults to \code{0}.
+#' @param wm Logical indicating if weighted mean should added for each species.
+#' @param legend.pos Controls the position of the legend. Might eihter be a list
+#'   object containing x and y coordinates (such as e.g. returned by
+#'   \code{\link{locator}}) of the \bold{topleft corner} of the legend box or
+#'   one of the following: \code{"topleft"} (default), \code{"bottomleft"},
+#'   \code{"topright"}, or \code{"bottomright"}. If \code{legend.pos == NULL}
+#'   the plotting of the legend is suppressed.
+#' @param legend.cex Numeric controlling the size of the legend.
+#' @references \insertRef{evanssmith2009}{phyloclim}
+#' @seealso \code{\link{pno}}
+#' @examples
+#' # load PNOs for Oxalis sect. Palmatifoliae
+#' data(PNO)
+#'
+#' # plot predicted niche occupany for annual mean temperature
+#' plotPNO(x = PNO$AnnualMeanTemperature,
+#'         xlab = "Annual Mean Temperature (degree C)")
+#'
+#' # same plot, but with weighted means added
+#' plotPNO(x = PNO$AnnualMeanTemperature,
+#'         xlab = "Annual Mean Temperature (degree C)", wm = TRUE)
 #' @importFrom grDevices rainbow
 #' @importFrom graphics legend lines plot
 #' @export

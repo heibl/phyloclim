@@ -4,8 +4,7 @@
 \alias{pno}
 \title{Predicted Niche Occupancy Profiles}
 \usage{
-pno(path_bioclim, path_model, subset = NULL, bin_width = 1,
-  bin_number = NULL)
+pno(path_bioclim, path_model, subset = NULL, bin_width = 1, bin_number = NULL)
 }
 \arguments{
 \item{path_bioclim}{A character string, giving the path to an ASCII raster
@@ -29,11 +28,12 @@ A data frame of cumulative probalities of suitability for each value
   The first column gives the mean of each category.
 }
 \description{
-Following the approach of Evans et al. (2009), \code{pno}
-  integrates species probability (suitability) distributions (e.g. derived
-  with MAXENT) with respect to single climatic (or other environmental)
-  variable in order to get predicted niche occupancy (PNO) profiles for each
-  species and environmental variable.
+Following the approach of
+  \insertCite{evanssmith2009;textual}{phyloclim}, \code{pno} integrates
+  species probability (suitability) distributions (e.g. derived with MAXENT)
+  with respect to single climatic (or other environmental) variable in order
+  to get predicted niche occupancy (PNO) profiles for each species and
+  environmental variable.
 }
 \details{
 The path argument \code{path_model} points to the directory where
@@ -47,10 +47,7 @@ The path argument \code{path_model} points to the directory where
   NODATA_value  \tab -9999 \cr }
 }
 \references{
-Evans, M. E. K., S. A. Smith, R. S. Flynn, and M. J. Donoghue.
-  2009. Climate, niche evolution,and diversification of the 'bird-cage
-  evening primroses' (\emph{Oenothera}, sections \emph{Anogra} and
-  \emph{Kleinia}). \emph{Am. Nat.} \bold{173}: 225-240.
+\insertRef{evanssmith2009}{phyloclim}
 }
 \seealso{
 \code{\link{pno.weighted.mean}}, \code{\link{niche.overlap}},

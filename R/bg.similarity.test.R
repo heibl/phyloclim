@@ -1,71 +1,103 @@
 ## This code is part of the phyloclim package
-## © C. Heibl 2009 (last update 2018-07-05)
+## © C. Heibl 2009 (last update 2020-01-15)
 
+#' @rdname niche.tests
 #' @importFrom methods slot
-#' @importFrom raster extract unstack sampleRandom writeRaster
-#' @importFrom sp coordinates read.asciigrid SpatialPoints
+#' @importFrom raster extract unstack mask sampleRandom writeRaster
+#' @importFrom rgeos gConvexHull
+#' @importFrom sp coordinates read.asciigrid SpatialPointsDataFrame
 #' @importFrom utils write.table
 #' @export
 
-
-bg.similarity.test <- function(p, env, n = 99, conf.level = .95, app, dir){
+bg.similarity.test <- function(p, env, n = 99, study.area.y = "mcp", conf.level = .95, app, dir){
   
   ## Checks and definitions
   ## ----------------------
+  study.area.y <- match.arg(study.area.y, c("env", "mcp"))
+  
+  ## Prepare file system 
+  ## -------------------
+  DIR <- ifelse(missing(dir), tempdir(), dir)
+  if (dir.exists(DIR))
+    unlink(DIR, recursive = TRUE)
+  dir.create(DIR)
+  dir.create(ODIR <- file.path(DIR, "out/"))
+  dir.create(PDIR <- file.path(DIR, "proj"))
+  
+  p <- SpatialPointsDataFrame(coords = p[, 2:3], data = p)
   names(p) <- c("species", "long", "lat")
-  layer.names <- names(env)
-  species <- sort(unique(as.character(p$species)))
-	
-  ## Sample 99999 background points from env
-  ## ---------------------------------------
-  bg <- sampleRandom(env, size = 9999, na.rm = TRUE, sp = TRUE)
-  bg <- data.frame("background", coordinates(bg), slot(bg, "data"))
+  p <- p[order(p$species), ]
+  n_occ <- table(as.character(p$species)) # corresponds to 'o' (p.2872)
+  if (length(n_occ) != 2) stop("'p' must contain exactly two species")
   
   ## Append covariate data to presence points
   ## ----------------------------------------
-  attributes <- extract(x = env, y = SpatialPoints(p[, 2:3]))
-  p <- data.frame(p, attributes)
-  NAs <- which(is.na(p), arr.ind = TRUE)
+  attributes <- extract(x = env, y = p)
+  p <- cbind(p, attributes)
+  NAs <- which(is.na(slot(p, "data")), arr.ind = TRUE)
   NAs <- unique(NAs[, 1])
   if (length(NAs)){
     p <- p[-NAs, ]
     warning(length(NAs), " presence points with missing environmental data removed")
   }
   
-  ## Sample n(spec1) and n(spec2) points from background
-  ## ---------------------------------------------------
-   nb.occ <- table(p[, 1])[species] # corresponds to 'o' (p.2872)
-  spec.vect <- sort(as.character(levels(p[, 1])[p[, 1]]))
-  random.presence <- function(i, x, nbo, p, name){
-    name <- paste(name, i, sep = "_")
-    s <- rbind(sampleRandom(x, size = nbo[1], na.rm = TRUE, sp = TRUE),
-               sampleRandom(x, size = nbo[2], na.rm = TRUE, sp = TRUE))
-    s <- data.frame(name, coordinates(s), slot(s, "data"))
-    colnames(s)[1:3] <- c("species", "long", "lat")
-    return(s)
+  ## Sample n(spec1) and n(spec2) points from the study area, do it n times
+  ## ----------------------------------------------------------------------
+  spec_vect <- as.character(p$species)
+  randomPresence <- function(i, n_occ, env1, env2, spec_vect){
+    name <- paste(spec_vect, i, sep = "_")
+    s <- rbind(sampleRandom(env1, size = n_occ[1], sp = TRUE),
+               sampleRandom(env2, size = n_occ[2], sp = TRUE))
+    SpatialPointsDataFrame(coords = s, data = data.frame(name, coordinates(s), slot(s, "data")))
   }
-  rp <- lapply(1:n, FUN = random.presence, x = env, nbo = nb.occ, name = spec.vect)
-  rp <- do.call(rbind, rp)
-	
-  ## Save input files:
-  ## -----------------
-  if (missing(dir)) {
-    DIR <- "R.phyloclim.temp"
-  }
-  else {
-    DIR <- dir
-  }
-  if (file.exists(DIR))
-    unlink(DIR, recursive = TRUE)
-  dir.create(DIR)
-  dir.create(ODIR <- paste(DIR, "out/", sep = "/"))
-  dir.create(PDIR <- paste(DIR, "proj/", sep = "/"))
   
-  write.table(bg, paste(DIR, "background.csv", sep = "/"), 
+  if (study.area.y == "mcp"){
+    
+    ## Define the "study areas" as convex hull of the presence points
+    S1 <- gConvexHull(p[p$species == names(n_occ)[1], ], byid = FALSE, id = NULL)
+    env1 <- mask(env, S1)
+    S2 <- gConvexHull(p[p$species == names(n_occ)[2], ], byid = FALSE, id = NULL)
+    env2 <- mask(env, S2)
+    rp <- lapply(1:n, FUN = randomPresence, n_occ = n_occ, 
+                 env1 = env1, env2 = env2, spec_vect = spec_vect)
+  } else {
+    
+    ## study.area.y == "env"
+    rp <- lapply(1:n, FUN = randomPresence, n_occ = n_occ, 
+                 env1 = env, env2 = env, spec_vect = spec_vect)
+  }
+  rp <- do.call(rbind, rp)
+  names(rp)[1:3] <- c("species", "long", "lat")
+  
+  ## Produce plot to check observed and sampled presence points
+  ## ----------------------------------------------------------
+  # pdf(file.path(DIR, "presence-points.pdf"))
+  # plot(env[[1]])
+  # plot(rp[grep(names(n_occ)[1], rp$species), ], pch = 21, add = TRUE, col = "blue")
+  # plot(rp[grep(names(n_occ)[2], rp$species), ], pch = 21, add = TRUE, col = "red")
+  # plot(p[p$species == names(n_occ)[1], ], pch = 21, add = TRUE, bg = "skyblue")
+  # plot(p[p$species == names(n_occ)[2], ], pch = 21, add = TRUE, bg = "orange")
+  # plot(S1, add = TRUE, border = "blue")
+  # plot(S2, add = TRUE, border = "red")
+  # dev.off()
+  
+  ## Bind observed and random presence points together
+  ## -------------------------------------------------
+  p <- rbind(p, rp)
+ 
+  ## Sample 99999 background points from env
+  ## ---------------------------------------
+  bg <- sampleRandom(env, size = 9999, na.rm = TRUE, sp = TRUE)
+  bg <- data.frame("background", coordinates(bg), slot(bg, "data"))
+  
+  
+  ## Save input files
+  ## ----------------
+  write.table(bg, file.path(DIR, "background.csv"), 
               row.names = FALSE, col.names = TRUE, sep = ",")
-  write.table(rbind(p, rp), paste(DIR, "samples.csv", sep = "/"),
+  write.table(slot(p, "data"), file.path(DIR, "samples.csv"),
               row.names = FALSE, col.names = TRUE, sep = ",")
-  fn <- paste0(PDIR, layer.names, ".asc")
+  fn <- file.path(PDIR, paste(names(env), "asc", sep = "."))
   env <- unstack(env)
   for (i in seq_along(fn)){
     writeRaster(x = env[[i]], filename = fn[i], format = "ascii", 
@@ -74,10 +106,10 @@ bg.similarity.test <- function(p, env, n = 99, conf.level = .95, app, dir){
 	
   ## Call MAXENT:
   ## ------------
-  togglelayertype <- ifelse(length(grep("cat_", layer.names)) > 0, "-t cat_", "")
-  CALL <- paste("java -jar", app ,   	
-                "-e ", paste(DIR, "background.csv", sep = "/"),
-                "-s ", paste(DIR, "samples.csv", sep = "/"),
+  togglelayertype <- ifelse(length(grep("cat_", names(env))) > 0, "-t cat_", "")
+  CALL <- paste("java -jar", app,   	
+                "-e ", file.path(DIR, "background.csv"),
+                "-s ", file.path(DIR, "samples.csv"),
                 "-j ", PDIR, 
                 "-o ", ODIR, 	
                 togglelayertype,
@@ -86,7 +118,7 @@ bg.similarity.test <- function(p, env, n = 99, conf.level = .95, app, dir){
 	
   ## Calculate D and I for observed data
   ## -----------------------------------
-  fns <- paste0(ODIR, species, "_proj.asc")
+  fns <- paste0(ODIR, names(n_occ), "_proj.asc")
   x <- read.asciigrid(fns[1])
   y <- read.asciigrid(fns[2])
   di <- di.enm(x = x, y = y)
@@ -114,13 +146,13 @@ bg.similarity.test <- function(p, env, n = 99, conf.level = .95, app, dir){
 
   # Remove MAXENT output:
   # ---------------------
-  if (DIR == "R.phyloclim.temp") unlink(DIR, recursive = TRUE)
+  if (missing(dir)) unlink(DIR, recursive = TRUE)
 	
 	# Create output object:
 	# ---------------------
   out <- list(
     method = "background similarity test",
-    species = species,
+    species = names(n_occ),
     null = paste0("niche models are either more similar \n", 
                  paste(rep(" ", 24), collapse = ""), 
                  "or more different than expected by chance"),

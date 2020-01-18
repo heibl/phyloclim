@@ -4,8 +4,20 @@
 \alias{plotAncClim}
 \title{Chronograms with Climatic Data on the Y-Axis}
 \usage{
-plotAncClim(x, layer, clades = NULL, col, density = TRUE, tipmode = 1,
-  nchar = 3, cex, tipspace, cladespace = 1, lwd, ylab = "")
+plotAncClim(
+  x,
+  layer,
+  clades = NULL,
+  col,
+  density = TRUE,
+  tipmode = 1,
+  nchar = 3,
+  cex,
+  tipspace,
+  cladespace = 1,
+  lwd,
+  ylab = ""
+)
 }
 \arguments{
 \item{x}{A list with elements \code{tree}, \code{data}, and (optional)
@@ -47,7 +59,7 @@ bioclimatic dimension of the plot.}
 }
 \description{
 Plot the history of climatic tolerance for a clade \emph{sensu}
- Evans et al. (2009).
+ \insertCite{evanssmith2009;textual}{phyloclim}.
 }
 \details{
 The main argument \code{x} is a list consisting of at least the first
@@ -61,9 +73,9 @@ The main argument \code{x} is a list consisting of at least the first
  respective bioclimatic variable for every tip in the tree.
 }
 \examples{
- # load phylogeny and PNOs of Oxalis sect. Palmatifoliae
- data(tree)
- data(PNO)
+# load phylogeny and PNOs of Oxalis sect. Palmatifoliae
+data(tree)
+data(PNO)
 
 # choose summer precipitation for analysis
 clim <- PNO$PrecipitationWarmestQuarter
@@ -85,10 +97,7 @@ plotAncClim(ac, tipmode = 2, nchar = 5)
 plotAncClim(ac, tipmode = 3, nchar = 4)
 }
 \references{
-Evans, M. E. K., S. A. Smith, R. S. Flynn, and M. J. Donoghue.
- 2009. Climate, niche evolution, and diversification of the 'bird-cage
- evening primroses' (\emph{Oenothera}, sections \emph{Anogra} and
- \emph{Kleinia}). \emph{Am. Nat.} \bold{173}: 225-240.
+\insertRef{evanssmith2009}{phyloclim}
 }
 \seealso{
 \code{\link{pno}}, \code{\link{pno.weighted.mean}},

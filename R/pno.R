@@ -1,12 +1,13 @@
 ## This code is part of the phyloclim package
-## © C. Heibl 2009 (last update 2018-09-17)
+## © C. Heibl 2009 (last update 2020-01-18)
 
 #' @title Predicted Niche Occupancy Profiles
-#' @description Following the approach of Evans et al. (2009), \code{pno}
-#'   integrates species probability (suitability) distributions (e.g. derived
-#'   with MAXENT) with respect to single climatic (or other environmental)
-#'   variable in order to get predicted niche occupancy (PNO) profiles for each
-#'   species and environmental variable.
+#' @description Following the approach of
+#'   \insertCite{evanssmith2009;textual}{phyloclim}, \code{pno} integrates
+#'   species probability (suitability) distributions (e.g. derived with MAXENT)
+#'   with respect to single climatic (or other environmental) variable in order
+#'   to get predicted niche occupancy (PNO) profiles for each species and
+#'   environmental variable.
 #' @param path_bioclim A character string, giving the path to an ASCII raster
 #'   map with environmental data (bioclimatic layer) and ArcGIS-compatible
 #'   header (see Details).
@@ -29,10 +30,7 @@
 #' @return A data frame of cumulative probalities of suitability for each value
 #'   on an environmental gradient (rows) for the a set of studied taxa (rows).
 #'   The first column gives the mean of each category.
-#' @references Evans, M. E. K., S. A. Smith, R. S. Flynn, and M. J. Donoghue.
-#'   2009. Climate, niche evolution,and diversification of the 'bird-cage
-#'   evening primroses' (\emph{Oenothera}, sections \emph{Anogra} and
-#'   \emph{Kleinia}). \emph{Am. Nat.} \bold{173}: 225-240.
+#' @references \insertRef{evanssmith2009}{phyloclim}
 #' @seealso \code{\link{pno.weighted.mean}}, \code{\link{niche.overlap}},
 #'   \code{\link{anc.clim}}
 #' @importFrom utils read.table

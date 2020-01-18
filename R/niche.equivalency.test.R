@@ -1,8 +1,9 @@
 ## This code is part of the phyloclim package
-## © C. Heibl 2009 (last update 2018-05-24)
+## © C. Heibl 2009 (last update 2020-01-18)
 
+#' @rdname niche.tests
 #' @importFrom raster extract sampleRandom
-#' @importFrom sp read.asciigrid
+#' @importFrom sp read.asciigrid SpatialPoints
 #' @importFrom stats pnorm sd
 #' @importFrom utils write.table
 #' @export

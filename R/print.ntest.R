@@ -1,3 +1,7 @@
+
+#' @rdname niche.tests
+#' @export
+
 print.ntest <- function(x, ...){
   
   ## format for pretty output
