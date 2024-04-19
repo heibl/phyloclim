@@ -1,10 +1,9 @@
 ## This code is part of the phyloclim package
-## © C. Heibl 2009 (last update 2020-01-15)
+## © C. Heibl 2009 (last update 2024-04-19)
 
 #' @rdname niche.tests
 #' @importFrom methods slot
 #' @importFrom raster extract unstack mask sampleRandom writeRaster
-#' @importFrom rgeos gConvexHull
 #' @importFrom sp coordinates read.asciigrid SpatialPointsDataFrame
 #' @importFrom utils write.table
 #' @export
@@ -53,13 +52,15 @@ bg.similarity.test <- function(p, env, n = 99, study.area.y = "mcp", conf.level 
   
   if (study.area.y == "mcp"){
     
+    stop("rgeos::gConvexHull no longer available. Ask package maintainer to fix this [2024-04-19]")
+    
     ## Define the "study areas" as convex hull of the presence points
-    S1 <- gConvexHull(p[p$species == names(n_occ)[1], ], byid = FALSE, id = NULL)
-    env1 <- mask(env, S1)
-    S2 <- gConvexHull(p[p$species == names(n_occ)[2], ], byid = FALSE, id = NULL)
-    env2 <- mask(env, S2)
-    rp <- lapply(1:n, FUN = randomPresence, n_occ = n_occ, 
-                 env1 = env1, env2 = env2, spec_vect = spec_vect)
+    # S1 <- gConvexHull(p[p$species == names(n_occ)[1], ], byid = FALSE, id = NULL)
+    # env1 <- mask(env, S1)
+    # S2 <- gConvexHull(p[p$species == names(n_occ)[2], ], byid = FALSE, id = NULL)
+    # env2 <- mask(env, S2)
+    # rp <- lapply(1:n, FUN = randomPresence, n_occ = n_occ, 
+    #              env1 = env1, env2 = env2, spec_vect = spec_vect)
   } else {
     
     ## study.area.y == "env"

@@ -1,5 +1,5 @@
 ## This code is part of the phyloclim package
-## © C. Heibl 2009 (last update 2018-05-24)
+## © C. Heibl 2009 (last update 2024-04-19)
 
 #' @importFrom sp read.asciigrid
 #' @export
@@ -8,7 +8,7 @@ niche.overlap <- function(x){
 	
 	# CASE 1: x is a pno matrix
 	# -------------------------
-	if ( is.data.frame(x) ){
+	if (is.data.frame(x)){
 		x <- x[, -1]
 		nspec <- ncol(x)
 		DI <- matrix(nrow = nspec, ncol = nspec)
@@ -24,7 +24,7 @@ niche.overlap <- function(x){
 
 	## CASE 2: x is vector of filenames
 	## ------------------------------
-	if ( class(x) == "character" ){
+	if (inherits(x, "character")){
 		nspec <- length(x)
 		DI <- matrix(nrow = nspec, ncol = nspec)
 		rownames(DI) <- colnames(DI) <- x
