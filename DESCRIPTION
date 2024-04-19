@@ -20,4 +20,4 @@ Description: Implements some methods in phyloclimatic modeling:
 License: GPL-3
 Encoding: UTF-8
 NeedsCompilation: no
-RoxygenNote: 7.0.2
+RoxygenNote: 7.1.1

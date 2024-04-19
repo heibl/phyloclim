@@ -1,15 +1,17 @@
+#' @export
+
 di.enm <- function(rn, x, y){
   
   if (!inherits(x, "Spatial")){
     if (!missing(rn)) {
-      x <- gsub("_", paste("_", rn, "_", sep = ""), x)
+      x <- gsub("_", paste0("_", rn, "_"), x)
     }
     x <- read.asciigrid(x)
   }
   
   if (!inherits(y, "Spatial")){
     if (!missing(rn)) {
-      y <- gsub("_", paste("_", rn, "_", sep = ""), y)
+      y <- gsub("_", paste0("_", rn, "_"), y)
     }
     y <- read.asciigrid(y)
   }
@@ -35,7 +37,7 @@ di.enm <- function(rn, x, y){
 	# (2008, Evolution 62:2868-2883)
 	I <- 1 - H^2 * 0.5 # <- corrected I
   
-  # both statistics range betweeen 0 (no overlap) and 1 (niches are identical)
+  # both statistics range between 0 (no overlap) and 1 (niches are identical)
 
 	c(D = D, I = I)	
 }

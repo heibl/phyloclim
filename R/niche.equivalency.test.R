@@ -1,5 +1,5 @@
 ## This code is part of the phyloclim package
-## © C. Heibl 2009 (last update 2020-01-18)
+## © C. Heibl 2009 (last update 2021-10-21)
 
 #' @rdname niche.tests
 #' @importFrom raster extract sampleRandom
@@ -8,7 +8,7 @@
 #' @importFrom utils write.table
 #' @export
 
-niche.equivalency.test <- function(p, env, n = 99, app, dir){
+niche.equivalency.test <- function(p, env, n = 99, app, dir = NULL){
 	
   # checks and definitions
   # ----------------------
@@ -41,25 +41,26 @@ niche.equivalency.test <- function(p, env, n = 99, app, dir){
   bg <- sampleRandom(env, size = 9999, na.rm = TRUE, sp = TRUE)
   bg <- data.frame("background", coordinates(bg), slot(bg, "data"))
   
-	# save input files:
-	# -----------------
-  if (missing(dir)) {
-    DIR <- "R.phyloclim.temp"
-  }
-  else {
+  ## Temporary input/output files
+  ## ----------------------------
+  if (is.null(dir)) {
+    DIR <- tempdir()
+  } else {
+    ## User-defined directory
     DIR <- dir
+    if (dir.exists(DIR))
+      unlink(DIR, recursive = TRUE)
+    dir.create(DIR)
   }
-  if (file.exists(DIR))
-    unlink(DIR, recursive = TRUE)
-  dir.create(DIR)
-  dir.create(ODIR <- paste(DIR, "out/", sep = "/"))
-  dir.create(PDIR <- paste(DIR, "proj/", sep = "/"))
   
-  write.table(bg, paste(DIR, "background.csv", sep = "/"), 
-              row.names = FALSE, col.names = TRUE, sep = ",")
-  write.table(rbind(p, pp), paste(DIR, "samples.csv", sep = "/"),
-              row.names = FALSE, col.names = TRUE, sep = ",")
-  fn <- paste(PDIR, layer.names, ".asc", sep = "")
+  dir.create(ODIR <- file.path(DIR, "out/"))
+  dir.create(PDIR <- file.path(DIR, "proj/"))
+  
+  in_fns <- file.path(DIR, c("background.csv", "samples.csv"))
+  
+  write.table(bg, in_fns[1], row.names = FALSE, col.names = TRUE, sep = ",")
+  write.table(rbind(p, pp), in_fns[2], row.names = FALSE, col.names = TRUE, sep = ",")
+  fn <- paste0(PDIR, layer.names, ".asc")
   env <- unstack(env)
   for (i in seq_along(fn)){
     writeRaster(x = env[[i]], filename = fn[i], format = "ascii", 
@@ -70,8 +71,8 @@ niche.equivalency.test <- function(p, env, n = 99, app, dir){
 	# ------------
   togglelayertype <- ifelse(length(grep("cat_", layer.names)) > 0, "-t cat_", "")
 	CALL <- paste("java -jar", app , 		
-    "-e ", paste(DIR, "background.csv", sep = "/"),
-		"-s ", paste(DIR, "samples.csv", sep = "/"),
+    "-e ", file.path(DIR, "background.csv"),
+		"-s ", file.path(DIR, "samples.csv"),
 		"-j ", PDIR, 
 		"-o ", ODIR,
     togglelayertype,
@@ -80,12 +81,13 @@ niche.equivalency.test <- function(p, env, n = 99, app, dir){
 	
 	# calculate D and I for original parameters and null distribution 
 	# ---------------------------------------------------------------
-	fns <- paste(ODIR, species, "_proj.asc", sep = "")
-  x <- read.asciigrid(fns[1])
-  y <- read.asciigrid(fns[2])
+	out_fns <- paste0(ODIR, species, "_proj.asc")
+  x <- read.asciigrid(out_fns[1])
+  y <- read.asciigrid(out_fns[2])
   di <- di.enm(x = x, y = y)
   
-  di.random <- sapply(X = 1:n, FUN = di.enm, x = fns[1], y = fns[2])
+  # di.random <- sapply(X = 1:n, FUN = di.enm, x = out_fns[1], y = out_fns[2])
+  di.random <- sapply(X = 1:n, FUN = di.enm, x = x, y = y)
   di.random <- t(di.random)
 	
 	# assess significance:
@@ -98,9 +100,9 @@ niche.equivalency.test <- function(p, env, n = 99, app, dir){
   p.D <- pnorm(di[1], m[1], s[1], lower.tail = TRUE)
   p.I <- pnorm(di[2], m[2], s[2], lower.tail = TRUE)
   
-	# remove MAXENT output:
-	# ---------------------
-  if (DIR == "R.phyloclim.temp") unlink(DIR, recursive = TRUE)
+	# remove MAXENT output (unless user-defined)
+	# ------------------------------------------
+  if (is.null(dir)) unlink(DIR, recursive = TRUE)
 	
 	# create output object:
 	# ---------------------
